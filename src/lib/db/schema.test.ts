@@ -24,6 +24,10 @@ const blockchainMigrationSql = readFileSync(
   ),
   "utf8",
 );
+const marketplaceMigrationSql = readFileSync(
+  join(process.cwd(), "supabase/migrations/20260525033800_marketplace_read_policies.sql"),
+  "utf8",
+);
 
 describe("database schema architecture", () => {
   it("tracks all required Phase 3 tables", () => {
@@ -75,6 +79,15 @@ describe("database schema architecture", () => {
     expect(blockchainMigrationSql).toContain("create table public.blockchain_events");
     expect(blockchainMigrationSql).toContain(
       "Users can insert own blockchain transactions",
+    );
+  });
+
+  it("adds marketplace read policies for uploader and reputation data", () => {
+    expect(marketplaceMigrationSql).toContain(
+      "Public can read uploaders for approved datasets",
+    );
+    expect(marketplaceMigrationSql).toContain(
+      "Public can read reputation for approved dataset uploaders",
     );
   });
 

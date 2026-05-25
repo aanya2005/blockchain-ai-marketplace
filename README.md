@@ -33,12 +33,14 @@ Implemented through Phase 2:
   WalletConnect support, Solidity DatasetRegistry and DatasetEscrow contracts,
   ABI integration, deployment scripts, transaction persistence, ownership records,
   escrow state records, and event sync utilities
+- Marketplace and dataset experience with searchable/filterable dataset browsing,
+  dataset details, purchase state checks, escrow purchase modal, related datasets,
+  transaction history, and expanded dashboard dataset management
 - Environment variable template
 - Architecture documentation
 
 Intentionally not implemented yet:
 
-- Marketplace purchasing UI
 - AI validation
 - Admin moderation tooling
 - Bounty workflows
@@ -128,6 +130,17 @@ After deployment, set:
 
 Wallets are linked by a signed message. Dataset ownership registration and escrow
 funding are persisted only after server-side transaction receipt verification.
+
+## Marketplace
+
+Marketplace routes:
+
+- `/marketplace` supports search, category/tag filters, sorting, pagination, and
+  empty/loading states.
+- `/marketplace/[datasetId]` shows metadata, CID, uploader reputation, ownership
+  status, transaction history, related datasets, and an escrow purchase CTA.
+- `/dashboard` summarizes uploaded, purchased, and owned datasets, earnings,
+  wallet status, reputation, and blockchain transactions.
 
 ## Documentation
 

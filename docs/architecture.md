@@ -7,8 +7,11 @@ upload storage milestone added authenticated encrypted dataset upload processing
 with Pinata/IPFS storage. The blockchain milestone adds Base Sepolia wallet
 connection, DatasetRegistry ownership registration, DatasetEscrow funding, ABI
 integration, deployment scripts, transaction persistence, ownership records, and
-event synchronization utilities. Marketplace purchasing UI, bounty submissions,
-AI validation, and admin moderation actions remain out of scope.
+event synchronization utilities. Bounty submissions, AI validation, and admin
+moderation actions remain out of scope.
+The marketplace milestone adds browse/search/filter/sort/pagination APIs, dataset
+detail pages, escrow purchase modal UI, purchase-state APIs, and dashboard
+dataset management views.
 
 ## Runtime
 
@@ -125,3 +128,16 @@ Application integration:
   persisting ownership and escrow state.
 - Supabase tables `dataset_ownerships`, `escrow_states`, and `blockchain_events`
   provide durable ownership, escrow, and event sync records.
+
+## Marketplace and dataset experience
+
+- Marketplace browsing is backed by `src/lib/marketplace/queries.ts` and exposed
+  through `/api/marketplace/datasets`.
+- Dataset detail pages show safe metadata previews, truncated CID display,
+  uploader reputation, ownership state, transaction history, related datasets, and
+  purchase CTA.
+- Purchase state checks are authenticated through `/api/marketplace/purchase-state`
+  and prevent duplicate/self-purchase UI paths before escrow funding.
+- Dashboard summaries use `/api/dashboard/summary` and shared query helpers to
+  present uploaded, purchased, and owned datasets, wallet links, earnings,
+  reputation, and blockchain transactions.
