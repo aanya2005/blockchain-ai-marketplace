@@ -101,6 +101,7 @@ export type Database = {
           banned_at?: string | null;
           updated_at?: string;
         };
+        Relationships: [];
       };
       wallet_links: {
         Row: {
@@ -130,6 +131,7 @@ export type Database = {
           verified_at?: string | null;
           updated_at?: string;
         };
+        Relationships: [];
       };
       datasets: {
         Row: {
@@ -205,6 +207,7 @@ export type Database = {
           published_at?: string | null;
           updated_at?: string;
         };
+        Relationships: [];
       };
       purchases: {
         Row: {
@@ -233,6 +236,7 @@ export type Database = {
           purchased_at?: string | null;
           updated_at?: string;
         };
+        Relationships: [];
       };
       transactions: {
         Row: {
@@ -278,6 +282,7 @@ export type Database = {
           metadata?: Json;
           updated_at?: string;
         };
+        Relationships: [];
       };
       bounties: {
         Row: {
@@ -319,6 +324,7 @@ export type Database = {
           status?: BountyStatus;
           updated_at?: string;
         };
+        Relationships: [];
       };
       submissions: {
         Row: {
@@ -354,6 +360,7 @@ export type Database = {
           reviewed_at?: string | null;
           updated_at?: string;
         };
+        Relationships: [];
       };
       reviews: {
         Row: {
@@ -382,6 +389,7 @@ export type Database = {
           comment?: string | null;
           updated_at?: string;
         };
+        Relationships: [];
       };
       notifications: {
         Row: {
@@ -420,6 +428,7 @@ export type Database = {
           read_at?: string | null;
           updated_at?: string;
         };
+        Relationships: [];
       };
       reputation_scores: {
         Row: {
@@ -450,6 +459,7 @@ export type Database = {
           bounty_acceptances?: number;
           updated_at?: string;
         };
+        Relationships: [];
       };
       reports: {
         Row: {
@@ -487,6 +497,7 @@ export type Database = {
           resolved_at?: string | null;
           updated_at?: string;
         };
+        Relationships: [];
       };
       admin_actions: {
         Row: {
@@ -510,6 +521,7 @@ export type Database = {
           created_at?: string;
         };
         Update: Record<string, never>;
+        Relationships: [];
       };
     };
     Views: Record<string, never>;

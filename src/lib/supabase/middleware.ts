@@ -6,7 +6,7 @@ import { getSupabasePublicConfig } from "@/lib/auth/config";
 import { getSafeRedirectPath } from "@/lib/auth/redirects";
 import type { Database } from "@/lib/supabase/database.types";
 
-const protectedRoutePrefixes = ["/dashboard"];
+const protectedRoutePrefixes = ["/dashboard", "/upload"];
 const authenticatedRedirectRoutes = ["/auth/login", "/auth/signup"];
 
 function isProtectedRoute(pathname: string) {

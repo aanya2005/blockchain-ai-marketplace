@@ -1,9 +1,10 @@
 # NeuroLedger Architecture
 
 Phase 1 established the deployable application foundation. Phase 2 added the
-Supabase Auth subsystem. Phase 3 adds the Supabase PostgreSQL schema, RLS
-policies, seed script, generated-style types, and server-safe DB helpers without
-starting upload, blockchain, marketplace, bounty workflows, AI, or admin
+Supabase Auth subsystem. Phase 3 added the Supabase PostgreSQL schema, RLS
+policies, seed script, generated-style types, and server-safe DB helpers. Phase 4
+adds authenticated local dataset upload processing without starting IPFS,
+blockchain, marketplace purchasing, bounty submissions, AI validation, or admin
 moderation actions.
 
 ## Runtime
@@ -81,3 +82,19 @@ Security model:
 Type-safe helpers live under `src/lib/db`. They intentionally avoid implementing
 feature workflows and only centralize current-user, wallet-link, reputation, and
 role-capability access patterns.
+
+## Uploads
+
+The upload subsystem is scoped to secure local processing:
+
+- `/upload` is protected by middleware and server-side auth verification.
+- `POST /api/uploads/datasets` requires Supabase Auth.
+- Metadata is validated with Zod and sanitized before persistence.
+- File validation is centralized in `src/lib/upload` and checks extension, MIME
+  type, executable signatures, size limits, malformed text content, CSV shape,
+  JSON validity, JSONL row validity, and ZIP headers.
+- Valid files are written to local temporary storage through the
+  `UploadStorage` abstraction. This is the seam where Pinata/IPFS storage should
+  replace local temp storage in Phase 5.
+- Only dataset metadata is persisted to Supabase in Phase 4; `cid` and
+  `blockchain_hash` remain null placeholders.

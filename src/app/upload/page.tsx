@@ -1,26 +1,29 @@
+import { redirect } from "next/navigation";
+
+import { DatasetUploadForm } from "@/components/upload/dataset-upload-form";
 import { PageShell } from "@/components/layout/page-shell";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { getServerAuthUser } from "@/lib/supabase/server";
 
 export const metadata = {
   title: "Upload",
 };
 
-export default function UploadPage() {
+export const dynamic = "force-dynamic";
+
+export default async function UploadPage() {
+  const user = await getServerAuthUser();
+
+  if (!user) {
+    redirect("/auth/login?redirectTo=/upload");
+  }
+
   return (
     <PageShell
-      eyebrow="Route boundary"
+      eyebrow="Secure upload"
       title="Dataset upload"
-      description="This route is reserved for the secure upload subsystem. Phase 1 establishes navigation and layout without accepting files yet."
+      description="Validate dataset metadata and files, store upload metadata in Supabase, and prepare local temporary storage for the later IPFS phase."
     >
-      <Card>
-        <CardHeader>
-          <CardTitle>Planned responsibility</CardTitle>
-        </CardHeader>
-        <CardContent className="text-muted-foreground">
-          Validate metadata, encrypt datasets, manage upload progress, and hand encrypted
-          assets to IPFS storage in later phases.
-        </CardContent>
-      </Card>
+      <DatasetUploadForm />
     </PageShell>
   );
 }
