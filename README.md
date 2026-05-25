@@ -6,7 +6,7 @@ foundation and route architecture.
 
 ## Phase 1 scope
 
-Implemented in this phase:
+Implemented through Phase 2:
 
 - Next.js 15 App Router
 - Strict TypeScript configuration
@@ -15,12 +15,17 @@ Implemented in this phase:
 - Vitest and React Testing Library
 - Application providers and theme system
 - Functional base routes
+- Supabase Auth email/password signup, login, logout, forgot password, and reset
+  password routes
+- Middleware-backed dashboard protection
+- Auth-aware navigation and reusable auth hooks/utilities
+- Role structure for `user`, `admin`, and `moderator`
+- Wallet-link data structure for the later blockchain phase
 - Environment variable template
 - Architecture documentation
 
-Intentionally not implemented in Phase 1:
+Intentionally not implemented yet:
 
-- Authentication
 - Database schema
 - Upload workflows
 - IPFS integration
@@ -51,7 +56,13 @@ npm run build
 ## Environment
 
 Copy `.env.example` to `.env.local` before implementing integration-backed
-subsystems. Phase 1 does not require live credentials to boot.
+subsystems. Authentication requires:
+
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+
+Server-only Supabase service-role credentials are documented for later backend
+phases and are never imported into client-side auth code.
 
 ## Documentation
 

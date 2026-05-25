@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { AuthNavigation } from "@/components/auth/auth-navigation";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { primaryNavigation } from "@/lib/constants/navigation";
@@ -34,6 +35,7 @@ export function SiteHeader() {
 
         <div className="flex items-center gap-2">
           <ThemeToggle />
+          <AuthNavigation />
         </div>
       </div>
     </header>
