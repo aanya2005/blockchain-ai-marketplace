@@ -3,6 +3,7 @@ export type UploadErrorCode =
   | "CONFIGURATION_ERROR"
   | "VALIDATION_ERROR"
   | "DUPLICATE_UPLOAD"
+  | "ENCRYPTION_ERROR"
   | "STORAGE_ERROR"
   | "DATABASE_ERROR"
   | "UNKNOWN";

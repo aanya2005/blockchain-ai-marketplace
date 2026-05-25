@@ -13,6 +13,10 @@ const migrationSql = readFileSync(
   join(process.cwd(), "supabase/migrations/20260525011000_create_core_schema.sql"),
   "utf8",
 );
+const ipfsMigrationSql = readFileSync(
+  join(process.cwd(), "supabase/migrations/20260525014500_add_ipfs_storage_metadata.sql"),
+  "utf8",
+);
 
 describe("database schema architecture", () => {
   it("tracks all required Phase 3 tables", () => {
@@ -49,6 +53,13 @@ describe("database schema architecture", () => {
   it("defines duplicate purchase and wallet protection indexes", () => {
     expect(migrationSql).toContain("purchases_unique_active_idx");
     expect(migrationSql).toContain("wallet_links_one_primary_per_user_idx");
+  });
+
+  it("tracks encrypted IPFS storage metadata on datasets", () => {
+    expect(ipfsMigrationSql).toContain("dataset_upload_status");
+    expect(ipfsMigrationSql).toContain("storage_metadata jsonb");
+    expect(ipfsMigrationSql).toContain("encryption_metadata jsonb");
+    expect(ipfsMigrationSql).toContain("datasets_stored_requires_cid");
   });
 
   it("keeps admin-only table metadata explicit", () => {

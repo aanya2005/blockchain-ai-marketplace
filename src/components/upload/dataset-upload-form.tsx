@@ -114,8 +114,8 @@ export function DatasetUploadForm() {
         <CardHeader>
           <CardTitle>Dataset details</CardTitle>
           <CardDescription>
-            Metadata is validated before upload and saved to Supabase with a local
-            temporary storage reference for this phase.
+            Metadata is validated before upload, encrypted server-side, pinned to IPFS,
+            and saved to Supabase with CID metadata.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -124,7 +124,7 @@ export function DatasetUploadForm() {
             <FormMessage
               message={
                 status === "success"
-                  ? "Dataset metadata saved successfully. Storage is ready for IPFS replacement in Phase 5."
+                  ? "Dataset encrypted, pinned to IPFS, and saved successfully."
                   : null
               }
               type="success"
@@ -328,7 +328,8 @@ export function DatasetUploadForm() {
           <CardHeader>
             <CardTitle>Secure processing</CardTitle>
             <CardDescription>
-              Phase 4 prepares uploads locally before IPFS and blockchain integrations.
+              Uploads are encrypted before Pinata/IPFS storage. Blockchain registration
+              remains deferred.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4 text-sm text-muted-foreground">

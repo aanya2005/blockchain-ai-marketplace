@@ -3,6 +3,7 @@ import type { AppRole } from "@/lib/auth/types";
 import type {
   AdminActionType,
   DatasetModerationStatus,
+  DatasetUploadStatus,
   DatasetVisibilityStatus,
   Insert,
   Row,
@@ -44,10 +45,12 @@ describe("database TypeScript types", () => {
     const update = {
       cid: "ipfs-cid-placeholder",
       blockchain_hash: null,
+      upload_status: "stored" satisfies DatasetUploadStatus,
     } satisfies Update<"datasets">;
 
     expect(insert.visibility_status).toBe("draft");
     expect(update.cid).toBe("ipfs-cid-placeholder");
+    expect(update.upload_status).toBe("stored");
   });
 
   it("supports admin action enum typing", () => {

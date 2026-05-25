@@ -27,8 +27,8 @@ Implemented through Phase 2:
 - Row Level Security policies, indexes, constraints, triggers, and seed data
 - Generated-style database TypeScript types and server-safe database helpers
 - Authenticated dataset upload workflow with metadata validation, drag-and-drop UI,
-  upload progress, retry handling, local temporary server storage, and Supabase
-  dataset metadata persistence
+  upload progress, retry handling, encrypted Pinata/IPFS storage, CID
+  persistence, rollback handling, and Supabase dataset metadata persistence
 - Environment variable template
 - Architecture documentation
 
@@ -88,16 +88,18 @@ supabase db reset
 
 The local seed accounts use password `NeuroLedger123`.
 
-## Uploads
+## Uploads and IPFS storage
 
-Phase 4 implements secure local upload processing only:
+The upload pipeline validates files and metadata before encrypted IPFS storage:
 
 - `/upload` is protected and requires authentication.
 - `POST /api/uploads/datasets` validates metadata and files server-side.
 - Supported files: CSV, JSON, JSONL, TXT, ZIP.
-- Files are written to secure local temporary storage for this phase.
-- Dataset metadata is persisted to the existing `datasets` table.
-- IPFS and blockchain registration are intentionally deferred.
+- Files are encrypted server-side before storage.
+- Encrypted files are pinned to Pinata/IPFS using server-only `PINATA_JWT`.
+- Dataset records persist CID, storage metadata, upload status, and encryption
+  metadata.
+- Blockchain registration is intentionally deferred.
 
 ## Documentation
 

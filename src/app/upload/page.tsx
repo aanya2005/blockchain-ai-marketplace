@@ -21,7 +21,7 @@ export default async function UploadPage() {
     <PageShell
       eyebrow="Secure upload"
       title="Dataset upload"
-      description="Validate dataset metadata and files, store upload metadata in Supabase, and prepare local temporary storage for the later IPFS phase."
+      description="Validate dataset metadata and files, encrypt content server-side, pin encrypted files to IPFS through Pinata, and persist CID metadata in Supabase."
     >
       <DatasetUploadForm />
     </PageShell>

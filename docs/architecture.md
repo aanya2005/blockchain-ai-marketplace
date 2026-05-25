@@ -2,10 +2,10 @@
 
 Phase 1 established the deployable application foundation. Phase 2 added the
 Supabase Auth subsystem. Phase 3 added the Supabase PostgreSQL schema, RLS
-policies, seed script, generated-style types, and server-safe DB helpers. Phase 4
-adds authenticated local dataset upload processing without starting IPFS,
-blockchain, marketplace purchasing, bounty submissions, AI validation, or admin
-moderation actions.
+policies, seed script, generated-style types, and server-safe DB helpers. The
+upload storage milestone adds authenticated encrypted dataset upload processing
+with Pinata/IPFS storage. Blockchain, marketplace purchasing, bounty
+submissions, AI validation, and admin moderation actions remain out of scope.
 
 ## Runtime
 
@@ -83,9 +83,9 @@ Type-safe helpers live under `src/lib/db`. They intentionally avoid implementing
 feature workflows and only centralize current-user, wallet-link, reputation, and
 role-capability access patterns.
 
-## Uploads
+## Uploads and IPFS storage
 
-The upload subsystem is scoped to secure local processing:
+The upload subsystem is scoped to secure encrypted storage:
 
 - `/upload` is protected by middleware and server-side auth verification.
 - `POST /api/uploads/datasets` requires Supabase Auth.
@@ -93,8 +93,11 @@ The upload subsystem is scoped to secure local processing:
 - File validation is centralized in `src/lib/upload` and checks extension, MIME
   type, executable signatures, size limits, malformed text content, CSV shape,
   JSON validity, JSONL row validity, and ZIP headers.
-- Valid files are written to local temporary storage through the
-  `UploadStorage` abstraction. This is the seam where Pinata/IPFS storage should
-  replace local temp storage in Phase 5.
-- Only dataset metadata is persisted to Supabase in Phase 4; `cid` and
-  `blockchain_hash` remain null placeholders.
+- Valid files are encrypted server-side with AES-256-GCM before storage.
+- Encrypted files are pinned to Pinata/IPFS through the `UploadStorage`
+  abstraction.
+- Dataset records persist CID, storage provider, upload status, encrypted file
+  size, encrypted checksum, storage metadata, and encryption metadata.
+- If Supabase persistence fails after Pinata pinning, the API attempts to unpin
+  the CID before returning a safe error.
+- `blockchain_hash` remains null until the blockchain milestone.

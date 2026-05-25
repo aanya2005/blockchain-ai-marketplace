@@ -4,7 +4,10 @@ import { NextResponse, type NextRequest } from "next/server";
 
 import { getUploadErrorPayload, UploadError } from "@/lib/upload/errors";
 import { datasetMetadataSchema } from "@/lib/upload/schema";
-import { createLocalTempUploadStorage } from "@/lib/upload/storage";
+import {
+  createEncryptedIpfsUploadStorage,
+  type StoredUpload,
+} from "@/lib/upload/storage";
 import type { DatasetUploadResponse } from "@/lib/upload/types";
 import { validateUploadFile } from "@/lib/upload/file-validation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -74,10 +77,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const storage = createLocalTempUploadStorage();
-    await storage.save({
+    const storage = createEncryptedIpfsUploadStorage();
+    let storedUpload: StoredUpload | null = null;
+
+    storedUpload = await storage.save({
       uploaderId: user.id,
       safeFilename: validatedFile.safeName,
+      mimeType: validatedFile.mimeType,
       buffer: validatedFile.buffer,
     });
 
@@ -94,8 +100,15 @@ export async function POST(request: NextRequest) {
       row_count: validatedFile.preview.rows,
       column_count: validatedFile.preview.columns,
       validation_score: null,
-      cid: null,
+      cid: storedUpload.cid,
       blockchain_hash: null,
+      storage_provider: storedUpload.storageProvider,
+      upload_status: "stored",
+      storage_metadata: storedUpload.storageMetadata,
+      encryption_metadata: storedUpload.encryptionMetadata,
+      encrypted_file_size_bytes: storedUpload.encryptedBufferSizeBytes,
+      encrypted_checksum_sha256: storedUpload.encryptedChecksumSha256,
+      pinned_at: new Date().toISOString(),
       visibility_status: metadata.publishState === "draft" ? "draft" : "private",
       moderation_status: "pending",
       published_at: null,
@@ -105,11 +118,19 @@ export async function POST(request: NextRequest) {
       .from("datasets")
       .insert(datasetInsert)
       .select(
-        "id,title,description,category,tags,file_name,file_size_bytes,file_mime_type,file_checksum_sha256,row_count,column_count,visibility_status,moderation_status,created_at",
+        "id,title,description,category,tags,file_name,file_size_bytes,file_mime_type,file_checksum_sha256,cid,storage_provider,upload_status,storage_metadata,encryption_metadata,encrypted_file_size_bytes,encrypted_checksum_sha256,pinned_at,row_count,column_count,visibility_status,moderation_status,created_at",
       )
       .single();
 
     if (insertError || !dataset) {
+      if (storedUpload) {
+        try {
+          await storage.rollback(storedUpload.cid);
+        } catch {
+          // The upload request should still fail safely if rollback is unavailable.
+        }
+      }
+
       throw new UploadError(
         "DATABASE_ERROR",
         "Dataset metadata could not be saved. Please retry the upload.",

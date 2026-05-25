@@ -14,6 +14,13 @@ export type DatasetModerationStatus =
   | "rejected"
   | "flagged"
   | "removed";
+export type DatasetStorageProvider = "pinata_ipfs";
+export type DatasetUploadStatus =
+  | "pending"
+  | "encrypting"
+  | "uploading"
+  | "stored"
+  | "failed";
 export type PurchaseStatus =
   | "pending"
   | "completed"
@@ -150,6 +157,13 @@ export type Database = {
           validation_score: number | null;
           cid: string | null;
           blockchain_hash: string | null;
+          storage_provider: DatasetStorageProvider | null;
+          upload_status: DatasetUploadStatus;
+          storage_metadata: Json;
+          encryption_metadata: Json;
+          encrypted_file_size_bytes: number | null;
+          encrypted_checksum_sha256: string | null;
+          pinned_at: string | null;
           price: number;
           currency: string;
           visibility_status: DatasetVisibilityStatus;
@@ -175,6 +189,13 @@ export type Database = {
           validation_score?: number | null;
           cid?: string | null;
           blockchain_hash?: string | null;
+          storage_provider?: DatasetStorageProvider | null;
+          upload_status?: DatasetUploadStatus;
+          storage_metadata?: Json;
+          encryption_metadata?: Json;
+          encrypted_file_size_bytes?: number | null;
+          encrypted_checksum_sha256?: string | null;
+          pinned_at?: string | null;
           price?: number;
           currency?: string;
           visibility_status?: DatasetVisibilityStatus;
@@ -199,6 +220,13 @@ export type Database = {
           validation_score?: number | null;
           cid?: string | null;
           blockchain_hash?: string | null;
+          storage_provider?: DatasetStorageProvider | null;
+          upload_status?: DatasetUploadStatus;
+          storage_metadata?: Json;
+          encryption_metadata?: Json;
+          encrypted_file_size_bytes?: number | null;
+          encrypted_checksum_sha256?: string | null;
+          pinned_at?: string | null;
           price?: number;
           currency?: string;
           visibility_status?: DatasetVisibilityStatus;
@@ -547,6 +575,8 @@ export type Database = {
       app_role: AppRole;
       dataset_visibility_status: DatasetVisibilityStatus;
       dataset_moderation_status: DatasetModerationStatus;
+      dataset_storage_provider: DatasetStorageProvider;
+      dataset_upload_status: DatasetUploadStatus;
       purchase_status: PurchaseStatus;
       transaction_type: TransactionType;
       transaction_status: TransactionStatus;
