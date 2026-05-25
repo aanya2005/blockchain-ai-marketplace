@@ -21,12 +21,16 @@ Implemented through Phase 2:
 - Auth-aware navigation and reusable auth hooks/utilities
 - Role structure for `user`, `admin`, and `moderator`
 - Wallet-link data structure for the later blockchain phase
+- Supabase PostgreSQL schema migration for users, datasets, purchases,
+  transactions, bounties, submissions, reviews, notifications, reputation,
+  reports, and admin actions
+- Row Level Security policies, indexes, constraints, triggers, and seed data
+- Generated-style database TypeScript types and server-safe database helpers
 - Environment variable template
 - Architecture documentation
 
 Intentionally not implemented yet:
 
-- Database schema
 - Upload workflows
 - IPFS integration
 - Blockchain contracts or wallet flows
@@ -63,6 +67,24 @@ subsystems. Authentication requires:
 
 Server-only Supabase service-role credentials are documented for later backend
 phases and are never imported into client-side auth code.
+
+## Database
+
+Phase 3 migration and seed files live in:
+
+```text
+supabase/migrations/20260525011000_create_core_schema.sql
+supabase/seed.sql
+```
+
+Apply them with the Supabase CLI in an environment that has Docker/Postgres
+available:
+
+```bash
+supabase db reset
+```
+
+The local seed accounts use password `NeuroLedger123`.
 
 ## Documentation
 

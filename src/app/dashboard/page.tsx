@@ -3,6 +3,10 @@ import { redirect } from "next/navigation";
 import { PageShell } from "@/components/layout/page-shell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { createAuthIdentity } from "@/lib/auth/roles";
+import {
+  createIdentityFromDatabaseUser,
+  getCurrentDatabaseUser,
+} from "@/lib/db/current-user";
 import { getServerAuthUser } from "@/lib/supabase/server";
 
 export const metadata = {
@@ -18,7 +22,10 @@ export default async function DashboardPage() {
     redirect("/auth/login?redirectTo=/dashboard");
   }
 
-  const identity = createAuthIdentity(user);
+  const databaseUser = await getCurrentDatabaseUser();
+  const identity = databaseUser
+    ? createIdentityFromDatabaseUser(databaseUser)
+    : createAuthIdentity(user);
 
   return (
     <PageShell

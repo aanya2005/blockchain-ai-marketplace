@@ -1,8 +1,10 @@
 # NeuroLedger Architecture
 
-Phase 1 established the deployable application foundation. Phase 2 adds the
-Supabase Auth subsystem without starting database, upload, blockchain,
-marketplace, bounty, AI, or admin moderation logic.
+Phase 1 established the deployable application foundation. Phase 2 added the
+Supabase Auth subsystem. Phase 3 adds the Supabase PostgreSQL schema, RLS
+policies, seed script, generated-style types, and server-safe DB helpers without
+starting upload, blockchain, marketplace, bounty workflows, AI, or admin
+moderation actions.
 
 ## Runtime
 
@@ -43,3 +45,39 @@ parallel architectures.
 - Roles are derived from Supabase user metadata with `user` as the safe default.
 - Wallet-link types exist for the later blockchain phase, but no wallet
   transaction or linking flow is active.
+
+## Database
+
+The core schema is defined in
+`supabase/migrations/20260525011000_create_core_schema.sql`.
+
+Tables:
+
+- `users`
+- `wallet_links`
+- `datasets`
+- `purchases`
+- `transactions`
+- `bounties`
+- `submissions`
+- `reviews`
+- `notifications`
+- `reputation_scores`
+- `reports`
+- `admin_actions`
+
+Security model:
+
+- Public reads are limited by RLS to approved public datasets, public reviews for
+  approved datasets, and open bounties.
+- Users can manage their own profile, wallet links, datasets, notifications, and
+  reports within policy limits.
+- Purchase and transaction visibility is scoped to relevant buyers, creators,
+  uploaders, and moderators.
+- Role elevation and dataset moderation changes are guarded by policies and
+  triggers.
+- Admin action records are append-only for moderators/admins.
+
+Type-safe helpers live under `src/lib/db`. They intentionally avoid implementing
+feature workflows and only centralize current-user, wallet-link, reputation, and
+role-capability access patterns.
