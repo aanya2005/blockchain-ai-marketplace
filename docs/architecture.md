@@ -3,9 +3,12 @@
 Phase 1 established the deployable application foundation. Phase 2 added the
 Supabase Auth subsystem. Phase 3 added the Supabase PostgreSQL schema, RLS
 policies, seed script, generated-style types, and server-safe DB helpers. The
-upload storage milestone adds authenticated encrypted dataset upload processing
-with Pinata/IPFS storage. Blockchain, marketplace purchasing, bounty
-submissions, AI validation, and admin moderation actions remain out of scope.
+upload storage milestone added authenticated encrypted dataset upload processing
+with Pinata/IPFS storage. The blockchain milestone adds Base Sepolia wallet
+connection, DatasetRegistry ownership registration, DatasetEscrow funding, ABI
+integration, deployment scripts, transaction persistence, ownership records, and
+event synchronization utilities. Marketplace purchasing UI, bounty submissions,
+AI validation, and admin moderation actions remain out of scope.
 
 ## Runtime
 
@@ -100,4 +103,25 @@ The upload subsystem is scoped to secure encrypted storage:
   size, encrypted checksum, storage metadata, and encryption metadata.
 - If Supabase persistence fails after Pinata pinning, the API attempts to unpin
   the CID before returning a safe error.
-- `blockchain_hash` remains null until the blockchain milestone.
+- `blockchain_hash` is populated when the authenticated uploader registers the
+  stored dataset with the DatasetRegistry contract.
+
+## Blockchain
+
+Contracts:
+
+- `contracts/DatasetRegistry.sol` registers dataset owner, CID, dataset hash, and
+  metadata URI with duplicate registration prevention.
+- `contracts/DatasetEscrow.sol` funds escrowed purchases, prevents duplicate
+  purchases per dataset/buyer, and releases payouts to verified sellers.
+
+Application integration:
+
+- Thirdweb powers wallet connection, MetaMask, WalletConnect, Base Sepolia chain
+  switching, and transaction submission.
+- Wallet linking requires a signed message bound to the authenticated Supabase
+  user ID, wallet address, and chain ID.
+- Server APIs verify transaction receipts through `BASE_SEPOLIA_RPC_URL` before
+  persisting ownership and escrow state.
+- Supabase tables `dataset_ownerships`, `escrow_states`, and `blockchain_events`
+  provide durable ownership, escrow, and event sync records.

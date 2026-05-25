@@ -72,6 +72,8 @@ export type AdminActionType =
   | "dataset_removed"
   | "report_resolved"
   | "bounty_cancelled";
+export type DatasetOwnershipStatus = "pending" | "registered" | "failed";
+export type EscrowStateStatus = "funded" | "released" | "refunded" | "failed";
 
 export type Database = {
   public: {
@@ -157,6 +159,11 @@ export type Database = {
           validation_score: number | null;
           cid: string | null;
           blockchain_hash: string | null;
+          registry_chain_id: number | null;
+          registry_contract_address: string | null;
+          registry_dataset_id: string | null;
+          registry_transaction_hash: string | null;
+          registered_on_chain_at: string | null;
           storage_provider: DatasetStorageProvider | null;
           upload_status: DatasetUploadStatus;
           storage_metadata: Json;
@@ -189,6 +196,11 @@ export type Database = {
           validation_score?: number | null;
           cid?: string | null;
           blockchain_hash?: string | null;
+          registry_chain_id?: number | null;
+          registry_contract_address?: string | null;
+          registry_dataset_id?: string | null;
+          registry_transaction_hash?: string | null;
+          registered_on_chain_at?: string | null;
           storage_provider?: DatasetStorageProvider | null;
           upload_status?: DatasetUploadStatus;
           storage_metadata?: Json;
@@ -220,6 +232,11 @@ export type Database = {
           validation_score?: number | null;
           cid?: string | null;
           blockchain_hash?: string | null;
+          registry_chain_id?: number | null;
+          registry_contract_address?: string | null;
+          registry_dataset_id?: string | null;
+          registry_transaction_hash?: string | null;
+          registered_on_chain_at?: string | null;
           storage_provider?: DatasetStorageProvider | null;
           upload_status?: DatasetUploadStatus;
           storage_metadata?: Json;
@@ -276,6 +293,10 @@ export type Database = {
           status: TransactionStatus;
           chain_id: number | null;
           tx_hash: string | null;
+          from_wallet_address: string | null;
+          to_wallet_address: string | null;
+          contract_address: string | null;
+          related_purchase_id: string | null;
           amount: number | null;
           currency: string;
           metadata: Json;
@@ -291,6 +312,10 @@ export type Database = {
           status?: TransactionStatus;
           chain_id?: number | null;
           tx_hash?: string | null;
+          from_wallet_address?: string | null;
+          to_wallet_address?: string | null;
+          contract_address?: string | null;
+          related_purchase_id?: string | null;
           amount?: number | null;
           currency?: string;
           metadata?: Json;
@@ -305,6 +330,10 @@ export type Database = {
           status?: TransactionStatus;
           chain_id?: number | null;
           tx_hash?: string | null;
+          from_wallet_address?: string | null;
+          to_wallet_address?: string | null;
+          contract_address?: string | null;
+          related_purchase_id?: string | null;
           amount?: number | null;
           currency?: string;
           metadata?: Json;
@@ -551,6 +580,126 @@ export type Database = {
         Update: Record<string, never>;
         Relationships: [];
       };
+      dataset_ownerships: {
+        Row: {
+          id: string;
+          dataset_id: string;
+          owner_id: string;
+          wallet_address: string;
+          chain_id: number;
+          registry_contract_address: string;
+          registry_dataset_id: string;
+          dataset_hash: string;
+          cid: string;
+          transaction_hash: string;
+          status: DatasetOwnershipStatus;
+          registered_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          dataset_id: string;
+          owner_id: string;
+          wallet_address: string;
+          chain_id: number;
+          registry_contract_address: string;
+          registry_dataset_id: string;
+          dataset_hash: string;
+          cid: string;
+          transaction_hash: string;
+          status?: DatasetOwnershipStatus;
+          registered_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          status?: DatasetOwnershipStatus;
+          registered_at?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      escrow_states: {
+        Row: {
+          id: string;
+          purchase_id: string | null;
+          dataset_id: string;
+          buyer_id: string;
+          seller_id: string;
+          buyer_wallet_address: string;
+          seller_wallet_address: string;
+          chain_id: number;
+          escrow_contract_address: string;
+          escrow_purchase_id: string;
+          fund_transaction_hash: string;
+          release_transaction_hash: string | null;
+          amount_wei: string;
+          status: EscrowStateStatus;
+          funded_at: string;
+          released_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          purchase_id?: string | null;
+          dataset_id: string;
+          buyer_id: string;
+          seller_id: string;
+          buyer_wallet_address: string;
+          seller_wallet_address: string;
+          chain_id: number;
+          escrow_contract_address: string;
+          escrow_purchase_id: string;
+          fund_transaction_hash: string;
+          release_transaction_hash?: string | null;
+          amount_wei: string;
+          status?: EscrowStateStatus;
+          funded_at?: string;
+          released_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          release_transaction_hash?: string | null;
+          status?: EscrowStateStatus;
+          released_at?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      blockchain_events: {
+        Row: {
+          id: string;
+          chain_id: number;
+          contract_address: string;
+          event_name: string;
+          transaction_hash: string;
+          log_index: number;
+          block_number: number;
+          payload: Json;
+          processed_at: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          chain_id: number;
+          contract_address: string;
+          event_name: string;
+          transaction_hash: string;
+          log_index: number;
+          block_number: number;
+          payload?: Json;
+          processed_at?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          processed_at?: string | null;
+          payload?: Json;
+        };
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: {
@@ -586,6 +735,8 @@ export type Database = {
       report_target_type: ReportTargetType;
       report_status: ReportStatus;
       admin_action_type: AdminActionType;
+      dataset_ownership_status: DatasetOwnershipStatus;
+      escrow_state_status: EscrowStateStatus;
     };
     CompositeTypes: Record<string, never>;
   };

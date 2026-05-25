@@ -11,6 +11,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
+    "contracts:compile": "node scripts/compile-contracts.mjs",
+    "contracts:deploy:base-sepolia": "node scripts/deploy-contracts.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },
@@ -46,6 +48,8 @@
     "react-dom": "^19.2.6",
     "react-hook-form": "^7.76.1",
     "tailwind-merge": "^3.6.0",
+    "thirdweb": "^5.120.0",
+    "viem": "^2.50.4",
     "zod": "^4.4.3"
   },
   "devDependencies": {
@@ -64,11 +68,31 @@
     "postcss": "^8.5.15",
     "prettier": "^3.8.3",
     "shadcn": "^4.8.0",
+    "solc": "^0.8.35",
     "tailwindcss": "^4.3.0",
     "typescript": "^6.0.3",
     "vitest": "^4.1.7"
   },
   "overrides": {
-    "postcss": "^8.5.15"
+    "postcss": "^8.5.15",
+    "tmp": "0.2.5",
+    "uuid": "11.1.1",
+    "ws": "8.21.0",
+    "viem": "$viem",
+    "@walletconnect/core": "2.23.9",
+    "@walletconnect/ethereum-provider": "2.23.9",
+    "@walletconnect/sign-client": "2.23.9",
+    "@walletconnect/universal-provider": "2.23.9",
+    "@walletconnect/utils": "2.23.9",
+    "@reown/appkit": "1.8.20",
+    "@reown/appkit-controllers": "1.8.20",
+    "@reown/appkit-pay": "1.8.20",
+    "@reown/appkit-scaffold-ui": "1.8.20",
+    "@reown/appkit-ui": "1.8.20",
+    "@reown/appkit-utils": "1.8.20",
+    "@metamask/sdk": "0.34.0",
+    "@metamask/utils": "11.11.0",
+    "@metamask/rpc-errors": "7.0.3",
+    "@gemini-wallet/core": "0.3.2"
   }
 }

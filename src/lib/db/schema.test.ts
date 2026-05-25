@@ -17,6 +17,13 @@ const ipfsMigrationSql = readFileSync(
   join(process.cwd(), "supabase/migrations/20260525014500_add_ipfs_storage_metadata.sql"),
   "utf8",
 );
+const blockchainMigrationSql = readFileSync(
+  join(
+    process.cwd(),
+    "supabase/migrations/20260525015900_add_blockchain_ownership_escrow.sql",
+  ),
+  "utf8",
+);
 
 describe("database schema architecture", () => {
   it("tracks all required Phase 3 tables", () => {
@@ -60,6 +67,15 @@ describe("database schema architecture", () => {
     expect(ipfsMigrationSql).toContain("storage_metadata jsonb");
     expect(ipfsMigrationSql).toContain("encryption_metadata jsonb");
     expect(ipfsMigrationSql).toContain("datasets_stored_requires_cid");
+  });
+
+  it("tracks blockchain ownership and escrow persistence tables", () => {
+    expect(blockchainMigrationSql).toContain("create table public.dataset_ownerships");
+    expect(blockchainMigrationSql).toContain("create table public.escrow_states");
+    expect(blockchainMigrationSql).toContain("create table public.blockchain_events");
+    expect(blockchainMigrationSql).toContain(
+      "Users can insert own blockchain transactions",
+    );
   });
 
   it("keeps admin-only table metadata explicit", () => {

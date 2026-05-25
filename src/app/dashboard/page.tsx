@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 
+import { WalletConnectionPanel } from "@/components/blockchain/wallet-connection-panel";
 import { PageShell } from "@/components/layout/page-shell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { createAuthIdentity } from "@/lib/auth/roles";
@@ -64,11 +65,12 @@ export default async function DashboardPage() {
             <CardTitle>Wallet links</CardTitle>
           </CardHeader>
           <CardContent className="text-sm leading-6 text-muted-foreground">
-            Wallet-link data structures are ready for the blockchain phase. No wallet
-            transaction or linking flow is active in this phase.
+            Wallet linking, Base Sepolia ownership registration, and escrow transaction
+            persistence are available below.
           </CardContent>
         </Card>
       </div>
+      <WalletConnectionPanel />
     </PageShell>
   );
 }

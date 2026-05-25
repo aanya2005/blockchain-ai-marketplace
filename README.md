@@ -29,17 +29,19 @@ Implemented through Phase 2:
 - Authenticated dataset upload workflow with metadata validation, drag-and-drop UI,
   upload progress, retry handling, encrypted Pinata/IPFS storage, CID
   persistence, rollback handling, and Supabase dataset metadata persistence
+- Base Sepolia blockchain layer with Thirdweb wallet connection, MetaMask and
+  WalletConnect support, Solidity DatasetRegistry and DatasetEscrow contracts,
+  ABI integration, deployment scripts, transaction persistence, ownership records,
+  escrow state records, and event sync utilities
 - Environment variable template
 - Architecture documentation
 
 Intentionally not implemented yet:
 
-- IPFS integration
-- Blockchain contracts or wallet flows
-- Marketplace state
-- Bounties
+- Marketplace purchasing UI
 - AI validation
-- Admin actions
+- Admin moderation tooling
+- Bounty workflows
 
 ## Getting started
 
@@ -99,7 +101,33 @@ The upload pipeline validates files and metadata before encrypted IPFS storage:
 - Encrypted files are pinned to Pinata/IPFS using server-only `PINATA_JWT`.
 - Dataset records persist CID, storage metadata, upload status, and encryption
   metadata.
-- Blockchain registration is intentionally deferred.
+- Uploaded datasets can be registered on-chain after wallet connection.
+
+## Blockchain
+
+Compile contracts:
+
+```bash
+npm run contracts:compile
+```
+
+Deploy to Base Sepolia after setting `BASE_SEPOLIA_RPC_URL` and
+`DEPLOYER_PRIVATE_KEY`:
+
+```bash
+npm run contracts:deploy:base-sepolia
+```
+
+After deployment, set:
+
+- `NEXT_PUBLIC_THIRDWEB_CLIENT_ID`
+- `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID`
+- `NEXT_PUBLIC_DATASET_REGISTRY_ADDRESS`
+- `NEXT_PUBLIC_DATASET_ESCROW_ADDRESS`
+- `BASE_SEPOLIA_RPC_URL`
+
+Wallets are linked by a signed message. Dataset ownership registration and escrow
+funding are persisted only after server-side transaction receipt verification.
 
 ## Documentation
 

@@ -2,6 +2,7 @@
 
 import { ThemeProvider } from "next-themes";
 import type { ReactNode } from "react";
+import { ThirdwebProvider } from "thirdweb/react";
 
 import { AuthProvider } from "@/components/providers/auth-provider";
 
@@ -17,7 +18,9 @@ export function AppProviders({ children }: AppProvidersProps) {
       enableSystem
       disableTransitionOnChange
     >
-      <AuthProvider>{children}</AuthProvider>
+      <ThirdwebProvider>
+        <AuthProvider>{children}</AuthProvider>
+      </ThirdwebProvider>
     </ThemeProvider>
   );
 }
