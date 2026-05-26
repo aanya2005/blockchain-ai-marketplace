@@ -1,147 +1,128 @@
-# NeuroLedger
+# DataMint AI — Blockchain Backend MVP
 
-NeuroLedger is a decentralized AI dataset marketplace. This repository currently
-contains Phase 1 of the product build: the production-ready application
-foundation and route architecture.
+A Vercel-ready Next.js app for a decentralized AI training data marketplace.
 
-## Phase 1 scope
+This package includes:
 
-Implemented through Phase 2:
+- **Beautiful marketplace UI** based on the mockup screens.
+- **Solidity smart contract** for dataset ownership records, purchase escrow, refunds, bounty creation, bounty submissions, and bounty payouts.
+- **IPFS upload API route** using Pinata.
+- **Wallet integration** through MetaMask / Coinbase Wallet-compatible injected wallets.
+- **Base Sepolia deployment setup** using Hardhat.
 
-- Next.js 15 App Router
-- Strict TypeScript configuration
-- TailwindCSS and Shadcn/UI-compatible styling foundation
-- ESLint and Prettier
-- Vitest and React Testing Library
-- Application providers and theme system
-- Functional base routes
-- Supabase Auth email/password signup, login, logout, forgot password, and reset
-  password routes
-- Middleware-backed dashboard protection
-- Auth-aware navigation and reusable auth hooks/utilities
-- Role structure for `user`, `admin`, and `moderator`
-- Wallet-link data structure for the later blockchain phase
-- Supabase PostgreSQL schema migration for users, datasets, purchases,
-  transactions, bounties, submissions, reviews, notifications, reputation,
-  reports, and admin actions
-- Row Level Security policies, indexes, constraints, triggers, and seed data
-- Generated-style database TypeScript types and server-safe database helpers
-- Authenticated dataset upload workflow with metadata validation, drag-and-drop UI,
-  upload progress, retry handling, encrypted Pinata/IPFS storage, CID
-  persistence, rollback handling, and Supabase dataset metadata persistence
-- Base Sepolia blockchain layer with Thirdweb wallet connection, MetaMask and
-  WalletConnect support, Solidity DatasetRegistry and DatasetEscrow contracts,
-  ABI integration, deployment scripts, transaction persistence, ownership records,
-  escrow state records, and event sync utilities
-- Marketplace and dataset experience with searchable/filterable dataset browsing,
-  dataset details, purchase state checks, escrow purchase modal, related datasets,
-  transaction history, and expanded dashboard dataset management
-- Environment variable template
-- Architecture documentation
+AI validation and user scoring are intentionally not implemented yet.
 
-Intentionally not implemented yet:
+---
 
-- AI validation
-- Admin moderation tooling
-- Bounty workflows
-
-## Getting started
+## 1. Install
 
 ```bash
 npm install
+```
+
+---
+
+## 2. Create environment file
+
+Copy `.env.example` into `.env.local`:
+
+```bash
+cp .env.example .env.local
+```
+
+Fill in:
+
+```bash
+PINATA_JWT=your_pinata_jwt_here
+PRIVATE_KEY=your_testnet_wallet_private_key_without_0x
+BASE_SEPOLIA_RPC_URL=https://sepolia.base.org
+```
+
+You need a little Base Sepolia ETH in the deployer wallet.
+
+---
+
+## 3. Deploy the smart contract
+
+```bash
+npm run compile
+npm run deploy:base-sepolia
+```
+
+The deploy script prints something like:
+
+```bash
+NEXT_PUBLIC_MARKETPLACE_CONTRACT_ADDRESS=0x...
+```
+
+Paste that address into `.env.local`.
+
+---
+
+## 4. Run locally
+
+```bash
 npm run dev
 ```
 
-Open `http://localhost:3000`.
-
-## Verification
+Open:
 
 ```bash
-npm run lint
-npm run typecheck
-npm run test
-npm run build
+http://localhost:3000
 ```
 
-## Environment
+---
 
-Copy `.env.example` to `.env.local` before implementing integration-backed
-subsystems. Authentication requires:
+## 5. Deploy to Vercel
 
-- `NEXT_PUBLIC_SUPABASE_URL`
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-
-Server-only Supabase service-role credentials are documented for later backend
-phases and are never imported into client-side auth code.
-
-## Database
-
-Phase 3 migration and seed files live in:
-
-```text
-supabase/migrations/20260525011000_create_core_schema.sql
-supabase/seed.sql
-```
-
-Apply them with the Supabase CLI in an environment that has Docker/Postgres
-available:
+1. Push this folder to GitHub.
+2. Go to Vercel and import the GitHub repo.
+3. Add these environment variables in Vercel Project Settings:
 
 ```bash
-supabase db reset
+PINATA_JWT=your_pinata_jwt_here
+NEXT_PUBLIC_MARKETPLACE_CONTRACT_ADDRESS=0xYourDeployedContractAddress
 ```
 
-The local seed accounts use password `NeuroLedger123`.
+4. Click Deploy.
 
-## Uploads and IPFS storage
+After deployment, Vercel gives you a clickable hosted link.
 
-The upload pipeline validates files and metadata before encrypted IPFS storage:
+---
 
-- `/upload` is protected and requires authentication.
-- `POST /api/uploads/datasets` validates metadata and files server-side.
-- Supported files: CSV, JSON, JSONL, TXT, ZIP.
-- Files are encrypted server-side before storage.
-- Encrypted files are pinned to Pinata/IPFS using server-only `PINATA_JWT`.
-- Dataset records persist CID, storage metadata, upload status, and encryption
-  metadata.
-- Uploaded datasets can be registered on-chain after wallet connection.
+## What the contract does
 
-## Blockchain
+### Dataset marketplace
 
-Compile contracts:
+- `listDataset(...)`
+- `updateDatasetStatus(...)`
+- `updateDatasetPrice(...)`
+- `buyDataset(...)`
 
-```bash
-npm run contracts:compile
-```
+### Escrow
 
-Deploy to Base Sepolia after setting `BASE_SEPOLIA_RPC_URL` and
-`DEPLOYER_PRIVATE_KEY`:
+- Buyer pays into the contract using `buyDataset(...)`.
+- Buyer can release payment with `releasePayment(...)`.
+- Seller or admin can refund with `refundPurchase(...)`.
+- Admin can resolve disputes with `resolveDispute(...)`.
 
-```bash
-npm run contracts:deploy:base-sepolia
-```
+### Bounties
 
-After deployment, set:
+- Developers fund requests with `createBounty(...)`.
+- Contributors submit IPFS CIDs with `submitBounty(...)`.
+- Bounty creator accepts a submission and releases payout with `acceptBountySubmission(...)`.
+- Creator/admin can cancel active bounties with `cancelBounty(...)`.
 
-- `NEXT_PUBLIC_THIRDWEB_CLIENT_ID`
-- `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID`
-- `NEXT_PUBLIC_DATASET_REGISTRY_ADDRESS`
-- `NEXT_PUBLIC_DATASET_ESCROW_ADDRESS`
-- `BASE_SEPOLIA_RPC_URL`
+---
 
-Wallets are linked by a signed message. Dataset ownership registration and escrow
-funding are persisted only after server-side transaction receipt verification.
+## Important security notes
 
-## Marketplace
+This is an MVP for testnet/demo use.
 
-Marketplace routes:
+Before mainnet:
 
-- `/marketplace` supports search, category/tag filters, sorting, pagination, and
-  empty/loading states.
-- `/marketplace/[datasetId]` shows metadata, CID, uploader reputation, ownership
-  status, transaction history, related datasets, and an escrow purchase CTA.
-- `/dashboard` summarizes uploaded, purchased, and owned datasets, earnings,
-  wallet status, reputation, and blockchain transactions.
-
-## Documentation
-
-- `docs/architecture.md` describes the current application foundation.
+- Get the contract audited.
+- Add production key management for encrypted dataset access.
+- Add terms/moderation for illegal or sensitive datasets.
+- Add rate limits and file scanning.
+- Do not upload private real-world datasets until encryption and access control are complete.

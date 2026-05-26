@@ -1,28 +1,8 @@
-# dependencies
 node_modules
-
-# next.js
 .next
-out
-
-# production
-build
-dist
-tsconfig.tsbuildinfo
-
-# testing
-coverage
-
-# environment
 .env
-.env*.local
-!.env.example
-
-# logs
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-
-# system
-.DS_Store
+.env.local
+artifacts
+cache
+typechain-types
+coverage

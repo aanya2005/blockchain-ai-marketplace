@@ -1,72 +1,148 @@
-import Link from "next/link";
+"use client";
 
-import { DatasetCard } from "@/components/marketplace/dataset-card";
-import { EmptyState } from "@/components/marketplace/empty-state";
-import { MarketplaceFilters } from "@/components/marketplace/marketplace-filters";
-import { PaginationControls } from "@/components/marketplace/pagination-controls";
-import { PageShell } from "@/components/layout/page-shell";
+import { useEffect, useMemo, useState } from "react";
+import { Loader2, Search, Star } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { parseMarketplaceFilters } from "@/lib/marketplace/filters";
-import { searchMarketplaceDatasets } from "@/lib/marketplace/queries";
+import { StatusBox } from "@/components/status-box";
+import { ethers, getReadContract, getWriteContract } from "@/lib/web3";
+import { formatEth, ipfsToGateway, truncateAddress } from "@/lib/utils";
 
-export const metadata = {
-  title: "Marketplace",
+type Dataset = {
+  id: bigint;
+  seller: string;
+  title: string;
+  description: string;
+  category: string;
+  tags: string;
+  dataCid: string;
+  metadataCid: string;
+  sizeLabel: string;
+  priceWei: bigint;
+  active: boolean;
+  createdAt: bigint;
+  totalSales: bigint;
 };
 
-type MarketplacePageProps = {
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
-};
+export default function MarketplacePage() {
+  const [datasets, setDatasets] = useState<Dataset[]>([]);
+  const [query, setQuery] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [status, setStatus] = useState("");
+  const [error, setError] = useState("");
 
-export default async function MarketplacePage({ searchParams }: MarketplacePageProps) {
-  const resolvedSearchParams = await searchParams;
-  const urlSearchParams = new URLSearchParams();
-  for (const [key, value] of Object.entries(resolvedSearchParams)) {
-    if (typeof value === "string") {
-      urlSearchParams.set(key, value);
+  async function loadDatasets() {
+    setError("");
+    setLoading(true);
+    try {
+      const contract = await getReadContract();
+      const count: bigint = await contract.datasetCount();
+      const items: Dataset[] = [];
+      for (let i = 1n; i <= count; i++) {
+        const dataset = await contract.datasets(i);
+        if (dataset.active) {
+          items.push({
+            id: dataset.id,
+            seller: dataset.seller,
+            title: dataset.title,
+            description: dataset.description,
+            category: dataset.category,
+            tags: dataset.tags,
+            dataCid: dataset.dataCid,
+            metadataCid: dataset.metadataCid,
+            sizeLabel: dataset.sizeLabel,
+            priceWei: dataset.priceWei,
+            active: dataset.active,
+            createdAt: dataset.createdAt,
+            totalSales: dataset.totalSales,
+          });
+        }
+      }
+      setDatasets(items.reverse());
+    } catch (err: any) {
+      setError(err?.message || "Could not load marketplace. Did you deploy the contract and set the address?");
+    } finally {
+      setLoading(false);
     }
   }
-  const filters = parseMarketplaceFilters(urlSearchParams);
-  const result = await searchMarketplaceDatasets(filters);
+
+  useEffect(() => {
+    loadDatasets();
+  }, []);
+
+  const filtered = useMemo(() => {
+    const q = query.toLowerCase();
+    return datasets.filter((dataset) => [dataset.title, dataset.description, dataset.category, dataset.tags].join(" ").toLowerCase().includes(q));
+  }, [datasets, query]);
+
+  async function buy(dataset: Dataset) {
+    setStatus("");
+    setError("");
+    try {
+      const contract = await getWriteContract();
+      setStatus(`Opening wallet to buy ${dataset.title}...`);
+      const tx = await contract.buyDataset(dataset.id, { value: dataset.priceWei });
+      setStatus(`Purchase transaction sent: ${tx.hash}. Waiting for confirmation...`);
+      await tx.wait();
+      setStatus("Purchase escrowed. Go to Wallet Dashboard to release payment after delivery or inspection.");
+      await loadDatasets();
+    } catch (err: any) {
+      setError(err?.reason || err?.message || "Purchase failed.");
+    }
+  }
 
   return (
-    <PageShell
-      eyebrow="Dataset marketplace"
-      title="Browse verified AI datasets."
-      description="Search privacy-aware, encrypted, IPFS-backed datasets with transparent ownership records and escrow-ready purchase flows."
-    >
-      <div className="space-y-8">
-        <MarketplaceFilters categories={result.categories} />
-        {result.datasets.length > 0 ? (
-          <>
-            <div className="flex items-center justify-between text-sm text-muted-foreground">
-              <span>
-                Showing {result.datasets.length} of {result.total} datasets
-              </span>
-              <span>Sorted by {filters.sort.replace("_", " ")}</span>
-            </div>
-            <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-              {result.datasets.map((dataset) => (
-                <DatasetCard key={dataset.id} dataset={dataset} />
-              ))}
-            </div>
-            <PaginationControls
-              page={result.page}
-              totalPages={result.totalPages}
-              searchParams={urlSearchParams}
-            />
-          </>
-        ) : (
-          <EmptyState
-            title="No approved datasets found"
-            description="Try broadening your filters or upload a dataset for review. Approved public datasets will appear here automatically."
-            action={
-              <Button asChild>
-                <Link href="/upload">Upload dataset</Link>
-              </Button>
-            }
-          />
-        )}
+    <main className="mx-auto max-w-7xl px-4 py-10 md:px-8">
+      <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+        <div>
+          <p className="text-sm font-bold uppercase tracking-[0.25em] text-cyan-600">Marketplace</p>
+          <h1 className="mt-2 text-4xl font-bold tracking-tight md:text-6xl">Browse on-chain datasets.</h1>
+        </div>
+        <Button onClick={loadDatasets} variant="outline">Refresh</Button>
       </div>
-    </PageShell>
+
+      <div className="mb-6 flex items-center gap-3 rounded-[1.5rem] bg-white px-4 py-3 shadow-soft">
+        <Search className="h-5 w-5 text-slate-400" />
+        <input className="w-full bg-transparent text-slate-700" placeholder="Search datasets, tags, or categories" value={query} onChange={(event) => setQuery(event.target.value)} />
+      </div>
+
+      {error && <div className="mb-5"><StatusBox type="error">{error}</StatusBox></div>}
+      {status && <div className="mb-5"><StatusBox type="info">{status}</StatusBox></div>}
+
+      {loading ? (
+        <div className="flex items-center gap-2 rounded-[1.5rem] bg-white p-6 shadow-soft"><Loader2 className="h-5 w-5 animate-spin" /> Loading contract data...</div>
+      ) : filtered.length === 0 ? (
+        <Card><CardContent><p className="text-slate-600">No active datasets yet. Upload the first one.</p></CardContent></Card>
+      ) : (
+        <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+          {filtered.map((dataset, index) => (
+            <Card key={dataset.id.toString()} className="overflow-hidden">
+              <div className={`h-28 bg-gradient-to-br ${index % 3 === 0 ? "from-cyan-400 to-blue-500" : index % 3 === 1 ? "from-violet-400 to-fuchsia-500" : "from-emerald-400 to-teal-500"} p-4`}>
+                <span className="rounded-full bg-white/25 px-3 py-1 text-xs font-bold text-white backdrop-blur">{dataset.category || "Dataset"}</span>
+              </div>
+              <CardContent>
+                <div className="mb-3 flex items-start justify-between gap-3">
+                  <h2 className="text-xl font-bold">{dataset.title}</h2>
+                  <span className="rounded-full bg-slate-100 px-3 py-1 text-sm font-bold">{formatEth(dataset.priceWei)}</span>
+                </div>
+                <p className="min-h-20 text-sm leading-6 text-slate-600">{dataset.description || "No description provided."}</p>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {(dataset.tags || dataset.category).split(",").filter(Boolean).slice(0, 3).map((tag) => <span key={tag} className="rounded-full bg-cyan-50 px-3 py-1 text-xs font-bold text-cyan-700">{tag.trim()}</span>)}
+                </div>
+                <div className="mt-5 flex items-center justify-between text-sm text-slate-500">
+                  <span>{dataset.sizeLabel}</span>
+                  <span className="inline-flex items-center gap-1"><Star className="h-4 w-4 fill-current text-amber-400" /> Sales: {dataset.totalSales.toString()}</span>
+                </div>
+                <div className="mt-2 text-xs text-slate-400">Seller: {truncateAddress(dataset.seller)}</div>
+                <div className="mt-5 grid grid-cols-2 gap-2">
+                  <a href={ipfsToGateway(dataset.metadataCid)} target="_blank" rel="noreferrer" className="rounded-2xl border border-slate-200 px-4 py-3 text-center text-sm font-bold hover:bg-slate-50">Metadata</a>
+                  <Button onClick={() => buy(dataset)}>Buy</Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+    </main>
   );
 }
