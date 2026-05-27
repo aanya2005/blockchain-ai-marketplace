@@ -17,13 +17,13 @@ export default function Home() {
           <div className="mb-5 inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-sm font-semibold text-cyan-100 ring-1 ring-white/15">
             <ShieldCheck className="h-4 w-4" /> IPFS storage + smart contract escrow
           </div>
-          <h1 className="text-5xl font-bold tracking-tight md:text-7xl">Own your data. Sell it to AI builders. Get paid on-chain.</h1>
+          <h1 className="text-5xl font-bold tracking-tight md:text-7xl">A decentralized marketplace for ethical AI training data.</h1>
           <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-300">
-            DataMint AI is a decentralized AI training data marketplace with dataset registration, IPFS CIDs, bounty payouts, and escrowed purchases on Base Sepolia.
+            Upload datasets, earn blockchain rewards, and help builders train better AI models with trnsparent ownership and payouts.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <Link href="/upload"><Button className="px-6 py-6 text-base"><Upload className="mr-2 h-5 w-5" /> Upload Dataset</Button></Link>
-            <Link href="/marketplace"><Button variant="secondary" className="px-6 py-6 text-base"><Store className="mr-2 h-5 w-5" /> Browse Marketplace</Button></Link>
+            <Link href="/upload"><Button variant="secondary" className="px-6 py-6 text-base"><Upload className="mr-2 h-5 w-5" /> Upload Dataset</Button></Link>
+            <Link href="/marketplace"><Button className="px-6 py-6 text-base"><Store className="mr-2 h-5 w-5" /> Browse Marketplace</Button></Link>
           </div>
         </div>
       </section>
