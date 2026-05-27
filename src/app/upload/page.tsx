@@ -79,7 +79,7 @@ export default function UploadPage() {
     <main className="mx-auto max-w-6xl px-4 py-10 md:px-8">
       <div className="mb-8">
         <p className="text-sm font-bold uppercase tracking-[0.25em] text-cyan-600">Upload Dataset</p>
-        <h1 className="mt-2 text-4xl font-bold tracking-tight md:text-6xl">Pin your data. Register ownership on-chain.</h1>
+        <h1 className="mt-2 text-4xl font-bold tracking-tight md:text-6xl">Own, verify, and share your AI data.</h1>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[1fr_0.82fr]">
