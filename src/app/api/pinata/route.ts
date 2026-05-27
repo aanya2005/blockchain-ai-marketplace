@@ -4,10 +4,8 @@ export const runtime = "nodejs";
 
 export async function POST(req: NextRequest) {
   try {
+    const demoMode = process.env.NEXT_PUBLIC_DEMO_MODE === "true";
     const jwt = process.env.PINATA_JWT;
-    if (!jwt) {
-      return NextResponse.json({ error: "Missing PINATA_JWT environment variable." }, { status: 500 });
-    }
 
     const incoming = await req.formData();
     const file = incoming.get("file");
@@ -22,6 +20,23 @@ export async function POST(req: NextRequest) {
     const priceEth = String(incoming.get("priceEth") || "0");
     const owner = String(incoming.get("owner") || "");
     const fileHash = String(incoming.get("fileHash") || "");
+
+    if (demoMode) {
+      const fakeFileCid = `bafybei-demo-file-${Date.now()}`;
+      const fakeMetadataCid = `bafybei-demo-metadata-${Date.now()}`;
+      return NextResponse.json({
+        fileCid: fakeFileCid,
+        metadataCid: fakeMetadataCid,
+        fileUrl: `https://gateway.pinata.cloud/ipfs/${fakeFileCid}`,
+        metadataUrl: `https://gateway.pinata.cloud/ipfs/${fakeMetadataCid}`,
+        sizeLabel: `${(file.size / 1024 / 1024).toFixed(2)} MB`,
+        demo: true,
+      });
+    }
+
+    if (!jwt) {
+      return NextResponse.json({ error: "Missing PINATA_JWT environment variable." }, { status: 500 });
+    }
 
     const fileForm = new FormData();
     fileForm.append("file", file, file.name);

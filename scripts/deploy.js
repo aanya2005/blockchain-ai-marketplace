@@ -1,10 +1,10 @@
-import { ethers } from "hardhat";
+const hre = require("hardhat");
 
 async function main() {
-  const [deployer] = await ethers.getSigners();
+  const [deployer] = await hre.ethers.getSigners();
   console.log("Deploying DataBazaarMarketplace with:", deployer.address);
 
-  const Marketplace = await ethers.getContractFactory("DataBazaarMarketplace");
+  const Marketplace = await hre.ethers.getContractFactory("DataBazaarMarketplace");
   const marketplace = await Marketplace.deploy();
   await marketplace.waitForDeployment();
 

@@ -8,8 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "compile": "hardhat compile",
-    "deploy:base-sepolia": "hardhat run scripts/deploy.ts --network baseSepolia",
-    "deploy:localhost": "hardhat run scripts/deploy.ts --network localhost",
+    "deploy:base-sepolia": "hardhat run scripts/deploy.js --network baseSepolia",
+    "deploy:localhost": "hardhat run scripts/deploy.js --network localhost",
     "node": "hardhat node"
   },
   "dependencies": {
@@ -31,6 +31,7 @@
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.16",
     "ts-node": "^10.9.2",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.2",
+    "dotenv": "^16.4.7"
   }
 }
